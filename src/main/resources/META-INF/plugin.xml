@@ -1,0 +1,27 @@
+<idea-plugin>
+    <id>com.taehyun.RestDocCodeGenerator</id>
+    <name>RestDocCodeGenerator</name>
+    <vendor email="th1993kim@gmail.com" url="https://codingdreamtree.tistory.com/">코딩꿈나무</vendor>
+
+    <description>
+        <![CDATA[
+            <h3>Controller Method Convert to RestDocs TestCode</h3>
+            <p>Enter your Controller(Handler) Class, And Put the cursor or caret on the method code</p><br/>
+            <p>Mouse Right Click And Click Generate Menu</p><br/>
+            <p>You can see MethodToRestDoc</p><br/>
+            <p>Just Click MethodToRestDoc, RestDoc TestCode Converted On Your Clipboard</p>
+        ]]>
+    </description>
+
+    <depends>com.intellij.java</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+    </extensions>
+    <actions>
+        <action id="MethodToRestDoc" class="main.MethodToRestDocTestCode"
+                text="MethodToRestDoc"
+                description="MethodToRestDocs">
+            <add-to-group group-id="GenerateGroup" anchor="first"/>
+        </action>
+    </actions>
+</idea-plugin>

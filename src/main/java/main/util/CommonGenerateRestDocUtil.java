@@ -1,12 +1,13 @@
 package main.util;
 
 import com.intellij.psi.*;
-import com.intellij.psi.util.PsiTypesUtil;
 import main.dto.RequestMappingProperty;
 import main.property.RestDocType;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class CommonGenerateRestDocUtil {
@@ -49,9 +50,7 @@ public class CommonGenerateRestDocUtil {
                 .append(")\n")
                 .append("\t.andDo(print())\n")
                 .append("\t.andExpect(status().isOk())\n");
-        String result = sb.toString();
-        sb.setLength(0);
-        return result;
+        return getStringBuilderResult(sb);
     }
 
     private static String getPathVariableHeader(List<PsiParameter> pathVariables) {
@@ -76,6 +75,7 @@ public class CommonGenerateRestDocUtil {
         final StringBuilder sb = new StringBuilder();
         sb.append("\t.andDo(\n")
                 .append("\t\tdocument(\"\",\n")
+                .append(generateRequestHeaderText())
                 .append(generateRequestParameterText(requestMappingProperty.getRequestParameters(), requestMappingProperty.getModelAttribute()))
                 .append(generatePathParameterText(requestMappingProperty.getPathVariables()))
                 .append(generateRequestFieldText(requestMappingProperty.getRequestBody()))
@@ -83,6 +83,20 @@ public class CommonGenerateRestDocUtil {
                 .append("\t\t)\n")
                 .append("\t);");
 
+        return getStringBuilderResult(sb);
+    }
+
+    private static String generateRequestHeaderText() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\t\t\trequestHeaders(\n")
+                .append("\t\t\t\t")
+                .append("headerWithName(HttpHeaders.CONTENT_TYPE).description(MediaType.APPLICATION_JSON)")
+                .append("\n\t\t\t)\n");
+        return getStringBuilderResult(sb);
+    }
+
+    @NotNull
+    private static String getStringBuilderResult(StringBuilder sb) {
         String result = sb.toString();
         sb.setLength(0);
         return result;
@@ -92,15 +106,13 @@ public class CommonGenerateRestDocUtil {
         StringBuilder sb = new StringBuilder();
         PsiClass responseClass = getPsiClass(returnType);
         if (responseClass != null && !"void".equalsIgnoreCase(responseClass.getName())) {
-            String restDocResultString = String.join(",\n\t\t\t", generateRecursiveRestDocText(responseClass, getBeforeFieldName(returnType), RestDocType.RESPONSE_BODY));
+            String restDocResultString = String.join(",\n\t\t\t", generateRecursiveRestDocText(responseClass, getBeforeFieldName(returnType), RestDocType.RESPONSE_BODY,  new AtomicInteger(10)));
             sb.append("\t\t\tresponseFields(\n")
                     .append("\t\t\t\t")
                     .append(restDocResultString)
                     .append("\n\t\t\t)\n");
         }
-        String result = sb.toString();
-        sb.setLength(0);
-        return result;
+        return getStringBuilderResult(sb);
     }
 
     private static String getBeforeFieldName(PsiType psiType) {
@@ -120,14 +132,12 @@ public class CommonGenerateRestDocUtil {
                 sb.append("\t\t\trequestFields(\n")
                         .append("\t\t\t\t")
                         .append(String.join(",\n\t\t\t\t\t", generateRecursiveRestDocText(requestClass,
-                                getBeforeFieldName(psiType), RestDocType.REQUEST_BODY)))
+                                getBeforeFieldName(psiType), RestDocType.REQUEST_BODY, new AtomicInteger(10))))
                         .append("\n\t\t\t),\n");
             }
         }
 
-        String result = sb.toString();
-        sb.setLength(0);
-        return result;
+        return getStringBuilderResult(sb);
     }
 
 
@@ -140,9 +150,7 @@ public class CommonGenerateRestDocUtil {
                     .append(generateRequestParameterWithNameFromModelAttribute(modelAttribute))
                     .append("\n\t\t\t),\n");
         }
-        String result = sb.toString();
-        sb.setLength(0);
-        return result;
+        return getStringBuilderResult(sb);
     }
 
     private static String generateRequestParameterWithNameFromModelAttribute(PsiParameter modelAttribute) {
@@ -151,7 +159,7 @@ public class CommonGenerateRestDocUtil {
             PsiType psiType = modelAttribute.getType();
             PsiClass modelClass = getPsiClass(psiType);
             if (modelClass != null) {
-                return String.join(",\n\t\t\t\t\t", generateRecursiveRestDocText(modelClass, getBeforeFieldName(psiType), RestDocType.MODEL_ATTRIBUTE));
+                return String.join(",\n\t\t\t\t\t", generateRecursiveRestDocText(modelClass, getBeforeFieldName(psiType), RestDocType.MODEL_ATTRIBUTE, new AtomicInteger(10)));
             }
         }
 
@@ -176,9 +184,7 @@ public class CommonGenerateRestDocUtil {
                     .append(generatePathParametersWithName(pathVariables))
                     .append("\n\t\t\t),\n");
         }
-        String result = sb.toString();
-        sb.setLength(0);
-        return result;
+        return getStringBuilderResult(sb);
     }
 
     private static String generatePathParametersWithName(List<PsiParameter> pathVariables) {
@@ -202,8 +208,11 @@ public class CommonGenerateRestDocUtil {
         return classType.resolve();
     }
 
-    private static List<String> generateRecursiveRestDocText(PsiClass psiClass, String beforeFieldName, RestDocType restDocType) {
+    private static List<String> generateRecursiveRestDocText(PsiClass psiClass, String beforeFieldName, RestDocType restDocType, AtomicInteger atomicInteger) {
         List<String> restDocList = new ArrayList<>();
+        if (atomicInteger.getAndAdd(-1) < 1) {
+            return restDocList;
+        };
         PsiField[] fields = psiClass.getFields();
         Arrays.stream(fields)
                 .forEach(field ->
@@ -225,12 +234,12 @@ public class CommonGenerateRestDocUtil {
                                     PsiClass genericClass = ((PsiClassType) parameter).resolve();
                                     fieldName += ".[].";
                                     if (genericClass == null) return;
-                                    restDocList.addAll(generateRecursiveRestDocText(genericClass, fieldName, restDocType));
+                                    restDocList.addAll(generateRecursiveRestDocText(genericClass, fieldName, restDocType, atomicInteger));
 
                                 } else {
                                     if (resolvedClass == null) return;
                                     fieldName += ".";
-                                    restDocList.addAll(generateRecursiveRestDocText(resolvedClass, fieldName, restDocType));
+                                    restDocList.addAll(generateRecursiveRestDocText(resolvedClass, fieldName, restDocType, atomicInteger));
                                 }
                             }
                         }
@@ -247,10 +256,7 @@ public class CommonGenerateRestDocUtil {
     }
 
     private static String generateResponseFieldText(PsiType type, String fieldName, RestDocType restDocType) {
-        if (restDocType.isResponseBody()) {
-            return "fieldWithPath(\"" + fieldName + "\").type(" + createJsonReturnType(type) + ").description(\"\")";
-        }
-        if (restDocType.isRequestBody()) {
+        if (restDocType.isResponseBody() || restDocType.isRequestBody()) {
             return "fieldWithPath(\"" + fieldName + "\").type(" + createJsonReturnType(type) + ").description(\"\")";
         }
         if (restDocType.isModelAttribute()) {

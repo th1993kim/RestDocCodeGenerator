@@ -1,8 +1,8 @@
-package main.dto;
+package com.codingdreamtree.RestDocCodeGenerator.dto;
 
 import com.intellij.psi.PsiParameter;
 import com.intellij.psi.PsiType;
-import main.property.MappingMethodProperty;
+import com.codingdreamtree.RestDocCodeGenerator.property.MappingMethodProperty;
 
 import java.util.List;
 

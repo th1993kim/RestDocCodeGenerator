@@ -1,4 +1,4 @@
-package main.property;
+package com.codingdreamtree.RestDocCodeGenerator.property;
 
 import java.util.Arrays;
 

@@ -1,5 +1,5 @@
 <idea-plugin>
-    <id>com.taehyun.RestDocCodeGenerator</id>
+    <id>com.codingdreamtree.RestDocCodeGenerator</id>
     <name>RestDocCodeGenerator</name>
     <vendor email="th1993kim@gmail.com" url="https://codingdreamtree.tistory.com/">코딩꿈나무</vendor>
 
@@ -18,7 +18,7 @@
     <extensions defaultExtensionNs="com.intellij">
     </extensions>
     <actions>
-        <action id="MethodToRestDoc" class="main.MethodToRestDocTestCode"
+        <action id="MethodToRestDoc" class="com.codingdreamtree.RestDocCodeGenerator.MethodToRestDocTestCode"
                 text="MethodToRestDoc"
                 description="MethodToRestDocs">
             <add-to-group group-id="GenerateGroup" anchor="first"/>

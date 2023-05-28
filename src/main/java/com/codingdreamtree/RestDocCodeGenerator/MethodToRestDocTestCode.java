@@ -1,5 +1,6 @@
-package main;
+package com.codingdreamtree.RestDocCodeGenerator;
 
+import com.codingdreamtree.RestDocCodeGenerator.property.ParameterAnnotation;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
@@ -8,11 +9,10 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.util.PsiTreeUtil;
-import main.dto.RequestMappingProperty;
-import main.property.MappingAnnotation;
-import main.property.MappingMethodProperty;
-import main.property.ParameterAnnotation;
-import main.util.CommonGenerateRestDocUtil;
+import com.codingdreamtree.RestDocCodeGenerator.dto.RequestMappingProperty;
+import com.codingdreamtree.RestDocCodeGenerator.property.MappingAnnotation;
+import com.codingdreamtree.RestDocCodeGenerator.property.MappingMethodProperty;
+import com.codingdreamtree.RestDocCodeGenerator.util.CommonGenerateRestDocUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,8 +23,8 @@ import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static main.property.MappingAnnotation.*;
-import static main.property.MappingMethodProperty.*;
+import static com.codingdreamtree.RestDocCodeGenerator.property.MappingAnnotation.*;
+import static com.codingdreamtree.RestDocCodeGenerator.property.MappingMethodProperty.*;
 
 public class MethodToRestDocTestCode extends AnAction {
 

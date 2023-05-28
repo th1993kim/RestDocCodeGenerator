@@ -1,4 +1,4 @@
-package main.util;
+package com.codingdreamtree.RestDocCodeGenerator.util;
 
 import com.intellij.psi.CommonClassNames;
 import com.intellij.psi.PsiClass;

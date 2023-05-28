@@ -1,8 +1,8 @@
-package main.util;
+package com.codingdreamtree.RestDocCodeGenerator.util;
 
 import com.intellij.psi.*;
-import main.dto.RequestMappingProperty;
-import main.property.RestDocType;
+import com.codingdreamtree.RestDocCodeGenerator.dto.RequestMappingProperty;
+import com.codingdreamtree.RestDocCodeGenerator.property.RestDocType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -91,7 +91,7 @@ public class CommonGenerateRestDocUtil {
         sb.append("\t\t\trequestHeaders(\n")
                 .append("\t\t\t\t")
                 .append("headerWithName(HttpHeaders.CONTENT_TYPE).description(MediaType.APPLICATION_JSON)")
-                .append("\n\t\t\t)\n");
+                .append("\n\t\t\t),\n");
         return getStringBuilderResult(sb);
     }
 
